@@ -53,7 +53,9 @@ class PostResource extends Resource
                         TextInput::make('slug')->minLength(3)->maxLength(10)->unique(ignoreRecord:true)->required(),
                         Select::make('category_id')
                             ->label('Category')
-                            ->options(Category::all()->pluck('name', 'id'))
+                            // ->options(Category::all()->pluck('name', 'id'))
+                            ->relationship('category', 'name')
+                            ->searchable()
                             ->required(),
                         ColorPicker::make('color')->required(),
                         MarkdownEditor::make('content')->required()->columnSpan('full'), // posso user columnSpanFull() ou columnSpan('full') para ocupar as colunas todas em width
