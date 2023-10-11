@@ -28,6 +28,9 @@ use Filament\Tables\Columns\CheckboxColumn;
 use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -138,7 +141,24 @@ class PostResource extends Resource
                 TextColumn::make('created_at')->label('Published on')->date()->sortable()->searchable()->toggleable(),
             ])
             ->filters([
-                //
+                // Filter::make('Published Posts')->query(
+                //     function (Builder $query) : Builder { // este Builder é para o meu intelephense detetar as funções do PHP e puder utilizá-las com a variável
+                //         return $query->where('published', true);
+                //     }
+                // ),
+                // Filter::make('Published Posts')->query(
+                //     function (Builder $query) : Builder {
+                //         return $query->where('published', false);
+                //     }
+                // ),
+                TernaryFilter::make('published'),
+                SelectFilter::make('category_id')
+                    ->label('Category')
+                    ->relationship('category', 'name')
+                    // ->options(Category::all()->pluck('name', 'id'))
+                    ->searchable()
+                    ->preload()
+                    // ->multiple()
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
