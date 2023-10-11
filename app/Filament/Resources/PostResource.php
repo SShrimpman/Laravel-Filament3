@@ -48,7 +48,8 @@ class PostResource extends Resource
                         // ]),
 
                         // nas rules posso usar duas formas : em string => rules('min:3|max:10'), em array => rules(['min:3', 'max:10'])
-                        TextInput::make('title')->numeric()->minValue(3)->maxValue(10)->required(),
+                        // TextInput::make('title')->numeric()->minValue(3)->maxValue(10)->required(),
+                        TextInput::make('title')->required(),
                         TextInput::make('slug')->minLength(3)->maxLength(10)->unique(ignoreRecord:true)->required(),
                         Select::make('category_id')
                             ->label('Category')
@@ -82,19 +83,22 @@ class PostResource extends Resource
     {
         return $table
             ->columns([
-                ImageColumn::make('thumbnail'),
-                ColorColumn::make('color'),
-                TextColumn::make('title'),
-                TextColumn::make('slug'),
-                TextColumn::make('category.name'),
-                TextColumn::make('tags'),
-                CheckboxColumn::make('published')
+                TextColumn::make('id')->sortable()->searchable()->toggleable(isToggledHiddenByDefault:true),
+                ImageColumn::make('thumbnail')->toggleable(),
+                ColorColumn::make('color')->toggleable(),
+                TextColumn::make('title')->sortable()->searchable()->toggleable(),
+                TextColumn::make('slug')->sortable()->searchable()->toggleable(),
+                TextColumn::make('category.name')->sortable()->searchable()->toggleable(),
+                TextColumn::make('tags')->toggleable(),
+                CheckboxColumn::make('published')->toggleable(),
+                TextColumn::make('created_at')->label('Published on')->date()->sortable()->searchable()->toggleable(),
             ])
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
