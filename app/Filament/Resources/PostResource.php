@@ -4,10 +4,12 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\PostResource\Pages;
 use App\Filament\Resources\PostResource\RelationManagers;
+use App\Filament\Resources\PostResource\RelationManagers\AuthorsRelationManager;
 use App\Models\Category;
 use App\Models\Post;
 use Filament\Forms;
 use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Group;
@@ -70,7 +72,17 @@ class PostResource extends Resource
                         Section::make('Meta')->schema([
                             TagsInput::make('tags')->required(),
                             Checkbox::make('published'),
-                        ])
+                        ]),
+                        // Section::make('Authors')->schema([
+                        //     // Select::make('authors')
+                        //     //     ->label('Co Authors')
+                        //     //     ->multiple()
+                        //     //     ->relationship('authors', 'name')
+                        //     CheckboxList::make('authors')
+                        //         ->searchable()
+                        //         ->label('Co Authors')
+                        //         ->relationship('authors', 'name')
+                        // ])
                     ])
             ])->columns(3);
             // ->columns([ isto é para eu controlar a responsividade, similarmente parecido com o TailwindCSS, normalmente não é preciso porque o Filament é bastante inteligente
@@ -115,7 +127,7 @@ class PostResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            AuthorsRelationManager::class
         ];
     }
 
