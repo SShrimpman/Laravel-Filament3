@@ -46,11 +46,14 @@ class PostResource extends Resource
                         //     TextInput::make('title')->required(),
                         //     TextInput::make('slug')->required(),
                         // ]),
-                        TextInput::make('title')->required(),
-                        TextInput::make('slug')->required(),
+
+                        // nas rules posso usar duas formas : em string => rules('min:3|max:10'), em array => rules(['min:3', 'max:10'])
+                        TextInput::make('title')->numeric()->minValue(3)->maxValue(10)->required(),
+                        TextInput::make('slug')->minLength(3)->maxLength(10)->unique(ignoreRecord:true)->required(),
                         Select::make('category_id')
                             ->label('Category')
-                            ->options(Category::all()->pluck('name', 'id')),
+                            ->options(Category::all()->pluck('name', 'id'))
+                            ->required(),
                         ColorPicker::make('color')->required(),
                         MarkdownEditor::make('content')->required()->columnSpan('full'), // posso user columnSpanFull() ou columnSpan('full') para ocupar as colunas todas em width
                     ])->columnSpan(2)->columns(2),
@@ -59,14 +62,14 @@ class PostResource extends Resource
                         Section::make('Image')
                             ->collapsed()
                             ->schema([
-                                FileUpload::make('thumbnail')->disk('public')->directory('thumbnails'),
+                                FileUpload::make('thumbnail')->disk('public')->directory('thumbnails')->nullable(),
                             ])->columnSpan(1),
                         Section::make('Meta')->schema([
                             TagsInput::make('tags')->required(),
-                            Checkbox::make('published')->required(),
+                            Checkbox::make('published'),
                         ])
                     ])
-            ])->columns(2);
+            ])->columns(3);
             // ->columns([ isto é para eu controlar a responsividade, similarmente parecido com o TailwindCSS, normalmente não é preciso porque o Filament é bastante inteligente
             //     'default' => 1,
             //     'md' => 2,
