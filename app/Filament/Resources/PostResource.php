@@ -10,7 +10,9 @@ use Filament\Forms;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Group;
 use Filament\Forms\Components\MarkdownEditor;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\TextInput;
@@ -35,17 +37,42 @@ class PostResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('title')->required(),
-                TextInput::make('slug')->required(),
-                Select::make('category_id')
-                    ->label('Category')
-                    ->options(Category::all()->pluck('name', 'id')),
-                ColorPicker::make('color')->required(),
-                MarkdownEditor::make('content')->required(),
-                FileUpload::make('thumbnail')->disk('public')->directory('thumbnails'),
-                TagsInput::make('tags')->required(),
-                Checkbox::make('published')->required(),
-            ]);
+                Section::make('Create a Post')
+                    ->description('create posts over here.')
+                    // ->aside() com isto eu separo a descrição que está em cima e meto ao lado, separada do schema
+                    // ->collapsed() Com isto posso colapsar a imagem, para vicar visível ou não
+                    ->schema([
+                        // Group::make()->schema([
+                        //     TextInput::make('title')->required(),
+                        //     TextInput::make('slug')->required(),
+                        // ]),
+                        TextInput::make('title')->required(),
+                        TextInput::make('slug')->required(),
+                        Select::make('category_id')
+                            ->label('Category')
+                            ->options(Category::all()->pluck('name', 'id')),
+                        ColorPicker::make('color')->required(),
+                        MarkdownEditor::make('content')->required()->columnSpan('full'), // posso user columnSpanFull() ou columnSpan('full') para ocupar as colunas todas em width
+                    ])->columnSpan(2)->columns(2),
+                Group::make()
+                    ->schema([
+                        Section::make('Image')
+                            ->collapsed()
+                            ->schema([
+                                FileUpload::make('thumbnail')->disk('public')->directory('thumbnails'),
+                            ])->columnSpan(1),
+                        Section::make('Meta')->schema([
+                            TagsInput::make('tags')->required(),
+                            Checkbox::make('published')->required(),
+                        ])
+                    ])
+            ])->columns(2);
+            // ->columns([ isto é para eu controlar a responsividade, similarmente parecido com o TailwindCSS, normalmente não é preciso porque o Filament é bastante inteligente
+            //     'default' => 1,
+            //     'md' => 2,
+            //     'lg' => 3,
+            //     'xl' => 4,
+            // ]);
     }
 
     public static function table(Table $table): Table
@@ -75,14 +102,14 @@ class PostResource extends Resource
                 Tables\Actions\CreateAction::make(),
             ]);
     }
-    
+
     public static function getRelations(): array
     {
         return [
             //
         ];
     }
-    
+
     public static function getPages(): array
     {
         return [
@@ -90,5 +117,5 @@ class PostResource extends Resource
             'create' => Pages\CreatePost::route('/create'),
             'edit' => Pages\EditPost::route('/{record}/edit'),
         ];
-    }    
+    }
 }
