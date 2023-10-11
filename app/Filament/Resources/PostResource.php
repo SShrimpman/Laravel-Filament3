@@ -16,10 +16,13 @@ use Filament\Forms\Components\Group;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\IconPosition;
 use Filament\Tables;
 use Filament\Tables\Columns\CheckboxColumn;
 use Filament\Tables\Columns\ColorColumn;
@@ -39,52 +42,79 @@ class PostResource extends Resource
     {
         return $form
             ->schema([
-                Section::make('Create a Post')
-                    ->description('create posts over here.')
-                    // ->aside() com isto eu separo a descrição que está em cima e meto ao lado, separada do schema
-                    // ->collapsed() Com isto posso colapsar a imagem, para vicar visível ou não
-                    ->schema([
-                        // Group::make()->schema([
-                        //     TextInput::make('title')->required(),
-                        //     TextInput::make('slug')->required(),
-                        // ]),
 
-                        // nas rules posso usar duas formas : em string => rules('min:3|max:10'), em array => rules(['min:3', 'max:10'])
-                        // TextInput::make('title')->numeric()->minValue(3)->maxValue(10)->required(),
-                        TextInput::make('title')->required(),
-                        TextInput::make('slug')->minLength(3)->maxLength(10)->unique(ignoreRecord:true)->required(),
-                        Select::make('category_id')
-                            ->label('Category')
-                            // ->options(Category::all()->pluck('name', 'id'))
-                            ->relationship('category', 'name')
-                            ->searchable()
-                            ->required(),
-                        ColorPicker::make('color')->required(),
-                        MarkdownEditor::make('content')->required()->columnSpan('full'), // posso user columnSpanFull() ou columnSpan('full') para ocupar as colunas todas em width
-                    ])->columnSpan(2)->columns(2),
-                Group::make()
-                    ->schema([
-                        Section::make('Image')
-                            ->collapsed()
-                            ->schema([
-                                FileUpload::make('thumbnail')->disk('public')->directory('thumbnails')->nullable(),
-                            ])->columnSpan(1),
-                        Section::make('Meta')->schema([
-                            TagsInput::make('tags')->required(),
-                            Checkbox::make('published'),
+                Tabs::make('Create New Post')->tabs([
+                    Tab::make('Tab 1')
+                        ->icon('heroicon-m-inbox')
+                        ->iconPosition(IconPosition::After)
+                        ->badge('Hi')
+                        ->schema([
+                            TextInput::make('title')->required(),
+                            TextInput::make('slug')->minLength(3)->maxLength(10)->unique(ignoreRecord:true)->required(),
+                            Select::make('category_id')
+                                ->label('Category')
+                                // ->options(Category::all()->pluck('name', 'id'))
+                                ->relationship('category', 'name')
+                                ->searchable()
+                                ->required(),
+                            ColorPicker::make('color')->required(),
                         ]),
-                        // Section::make('Authors')->schema([
-                        //     // Select::make('authors')
-                        //     //     ->label('Co Authors')
-                        //     //     ->multiple()
-                        //     //     ->relationship('authors', 'name')
-                        //     CheckboxList::make('authors')
-                        //         ->searchable()
-                        //         ->label('Co Authors')
-                        //         ->relationship('authors', 'name')
-                        // ])
-                    ])
-            ])->columns(3);
+                    Tab::make('Content')->schema([
+                        MarkdownEditor::make('content')->required()->columnSpan('full'),
+                    ]),
+                    Tab::make('Meta')->schema([
+                        FileUpload::make('thumbnail')->disk('public')->directory('thumbnails')->nullable(),
+                        TagsInput::make('tags')->required(),
+                        Checkbox::make('published'),
+                    ]),
+                ])->activeTab(3)->persistTabInQueryString(),
+
+                // Section::make('Create a Post')
+                //     ->description('create posts over here.')
+                //     // ->aside() com isto eu separo a descrição que está em cima e meto ao lado, separada do schema
+                //     // ->collapsed() Com isto posso colapsar a imagem, para vicar visível ou não
+                //     ->schema([
+                //         Group::make()->schema([
+                //             TextInput::make('title')->required(),
+                //             TextInput::make('slug')->required(),
+                //         ]),
+
+                //         // nas rules posso usar duas formas : em string => rules('min:3|max:10'), em array => rules(['min:3', 'max:10'])
+                //         TextInput::make('title')->numeric()->minValue(3)->maxValue(10)->required(),
+                //         TextInput::make('title')->required(),
+                //         TextInput::make('slug')->minLength(3)->maxLength(10)->unique(ignoreRecord:true)->required(),
+                //         Select::make('category_id')
+                //             ->label('Category')
+                //             // ->options(Category::all()->pluck('name', 'id'))
+                //             ->relationship('category', 'name')
+                //             ->searchable()
+                //             ->required(),
+                //         ColorPicker::make('color')->required(),
+                //         MarkdownEditor::make('content')->required()->columnSpan('full'), // posso user columnSpanFull() ou columnSpan('full') para ocupar as colunas todas em width
+                //     ])->columnSpan(2)->columns(2),
+            //     Group::make()
+            //         ->schema([
+            //             Section::make('Image')
+            //                 ->collapsed()
+            //                 ->schema([
+            //                     FileUpload::make('thumbnail')->disk('public')->directory('thumbnails')->nullable(),
+            //                 ])->columnSpan(1),
+            //             Section::make('Meta')->schema([
+            //                 TagsInput::make('tags')->required(),
+            //                 Checkbox::make('published'),
+            //             ]),
+            //             // Section::make('Authors')->schema([
+            //             //     // Select::make('authors')
+            //             //     //     ->label('Co Authors')
+            //             //     //     ->multiple()
+            //             //     //     ->relationship('authors', 'name')
+            //             //     CheckboxList::make('authors')
+            //             //         ->searchable()
+            //             //         ->label('Co Authors')
+            //             //         ->relationship('authors', 'name')
+            //             // ])
+            //         ])
+            ])->columns(1);
             // ->columns([ isto é para eu controlar a responsividade, similarmente parecido com o TailwindCSS, normalmente não é preciso porque o Filament é bastante inteligente
             //     'default' => 1,
             //     'md' => 2,
